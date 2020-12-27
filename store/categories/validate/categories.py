@@ -23,7 +23,9 @@ class CategoryValidate:
         return True
 
     def check_name(self, name):
-        if not name or not isinstance(name, str):
+        if not name:
+            self.errors.append({"value error": f"name is required"})
+        if not isinstance(name, str):
             self.errors.append({"value error": f"name {name} must be string"})
         if not self.is_unique(name):
             self.errors.append({"value error": f"{name} must be unique"})
@@ -31,18 +33,23 @@ class CategoryValidate:
     def validate(self, data):
         if not self.data_is_dict(data):
             return
+        if not data:
+            self.errors.append({"structure error": "empty data"})
+            return
         name = data.get('name', "")
         self.check_name(name)
         self.validated_data.append({"name": name, "parent": None})
         queue = [data, ]
         while queue:
             category = queue.pop(0)
-            parent = category['name']
+            parent = category.get('name', "")
             children = category.get('children', [])
             if not isinstance(children, list):
-                self.errors.append({"structure error": "input data must be dict"})
+                self.errors.append({"structure error": "'children' input data must be list"})
             for child in children:
-                name = child["name"]
+                if not self.data_is_dict(child):
+                    return
+                name = child.get("name", "")
                 self.validated_data.append({"name": name, "parent": parent})
                 self.check_name(name)
                 queue.append(child)
