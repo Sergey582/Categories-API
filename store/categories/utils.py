@@ -11,6 +11,16 @@ def get_data_from_query(query):
     return result
 
 
+def get_data_from_object_without_parent(obj):
+    return {"id": obj.pk, "name": obj.name}
+
+
+def get_data_from_query_without_parent(query):
+    result = [get_data_from_object_without_parent(category)
+              for category in query]
+    return result
+
+
 def get_parents(parent):
     queue = get_data_from_query(Category.objects.filter(name=parent))
     result_parents = []
