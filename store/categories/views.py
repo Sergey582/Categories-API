@@ -4,12 +4,12 @@
 # from django.shortcuts import render
 #
 from rest_framework.response import Response
-from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED
+from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_200_OK
 from rest_framework.views import APIView
 
 from categories.models import Category
 from categories.serializer import CategorySerializer
-from categories.utils import get_parents, get_data_from_query
+from categories.utils import get_parents, get_data_from_query_without_parent
 from categories.validate.categories import CategoryValidate
 
 
@@ -29,6 +29,7 @@ class ArticleView(APIView):
         category["id"] = main_category.pk
         category["name"] = main_category.name
         category["parents"] = get_parents(main_category.parent)
-        category["children"] =  get_data_from_query(Category.objects.filter(parent=main_category.name))
-        category["siblings"] = get_data_from_query(Category.objects.filter(parent=main_category.parent))
-        return Response(status=HTTP_201_CREATED, data=category)
+        category["children"] = get_data_from_query_without_parent(Category.objects.filter(parent=main_category.name))
+        category["siblings"] = get_data_from_query_without_parent(
+            Category.objects.filter(parent=main_category.parent).exclude(name=main_category.name))
+        return Response(status=HTTP_200_OK, data=category)
