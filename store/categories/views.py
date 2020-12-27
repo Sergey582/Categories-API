@@ -3,6 +3,7 @@
 # # Create your views here.
 # from django.shortcuts import render
 #
+from django.shortcuts import get_object_or_404
 from rest_framework.response import Response
 from rest_framework.status import HTTP_400_BAD_REQUEST, HTTP_201_CREATED, HTTP_200_OK
 from rest_framework.views import APIView
@@ -25,7 +26,7 @@ class ArticleView(APIView):
 
     def get(self, request, pk):
         category = {}
-        main_category = Category.objects.get(pk=pk)
+        main_category = get_object_or_404(Category, pk=pk)
         category["id"] = main_category.pk
         category["name"] = main_category.name
         category["parents"] = get_parents(main_category.parent)
